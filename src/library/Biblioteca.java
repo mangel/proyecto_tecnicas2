@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class Biblioteca {
     
-    private ArrayList<Autor> autores;
-    private ArrayList<Libro> libros;
+    private final ArrayList<Autor> autores;
+    private final ArrayList<Libro> libros;
     
     public Biblioteca(){
         autores = new ArrayList<>();
@@ -13,21 +13,30 @@ public class Biblioteca {
     }
     
     public void agregarAutor(String nombre, String mail, String genero){
-        if (!autorExiste(nombre)){
+        if (!autorExiste(nombre))
             autores.add(new Autor(nombre, mail, genero));
-        }
     }
     
     public void agregarLibro(String titulo, String autores, int cantidad, int paginas){
-        if (!libroExiste(titulo)){
-            String[] tokens = autores.split("_");
-        
-            for(String s: tokens)
-                if(!autorExiste(s))
-                    agregarAutor(s, "", "");
-
-            libros.add(new Libro(titulo, cantidad, paginas, tokens));
+        Libro l = new Libro(titulo, cantidad, paginas);
+            
+        String[] tokens = autores.split("_");
+            
+        Autor ta = null;
+            
+        for(String s: tokens) {
+            ta = obtenerAutor(s);
+            if (ta == null){
+                ta = new Autor(s);
+                ta.agregarLibro(l);
+                l.agregarAutor(ta);
+            } else {
+                l.agregarAutor(ta);
+                ta.agregarLibro(l);
+            }
         }
+            
+        agregarLibro(l);
     }
     
     public ArrayList<Libro> buscarLibrosPorTitulo(String titulo){
@@ -63,6 +72,48 @@ public class Biblioteca {
         return libros;
     }
     
+    public int contarAutores(){
+        return autores.size();
+    }
+    
+    public Libro obtenerLibroConMasPaginas(){
+        Libro result = null;
+        
+        for(Libro l : libros)
+            if (result != null){
+                if(l.darPaginas() > result.darPaginas())
+                    result = l;
+            } else
+                result = l;
+        
+        return result;
+    }
+    
+    public Autor obtenerAutorConMasLibros(){
+        Autor result = null;
+        
+        for(Autor a:autores)
+            if(result != null){
+                if(a.contarLibros() > result.contarLibros())
+                    result = a;
+            } else
+                result = a;
+                
+        return result;
+    }
+    
+    public boolean editarPaginasLibro(String titulo, int nuevoValorPaginas){
+        boolean result = false;
+        Libro l = obtenerLibro(titulo);
+        
+        if (l != null){
+            l.editarPaginas(nuevoValorPaginas);
+            result = true;
+        }
+        
+        return result;
+    }
+    
     private boolean autorExiste(String nombre){
         boolean result = false;
         for(Autor a : autores)
@@ -81,5 +132,48 @@ public class Biblioteca {
                 break;
             }
         return result;
+    }
+    
+    private Autor obtenerAutor(String nombre){
+        Autor a = null;
+        
+        for(Autor ta:autores)
+            if(ta.darNombre().equals(nombre)){
+                a = ta;
+                break;
+            }
+        
+        return a;
+    }
+    
+    private Libro obtenerLibro (String titulo){
+        Libro l = null;
+        
+        for (Libro tl:libros)
+            if(tl.darTitulo().equals(titulo)){
+                l = tl;
+                break;
+            }
+        
+        return l;
+    }
+    
+    private void agregarAutor(Autor autor) {
+        if(!autorExiste(autor.darNombre()))
+            autores.add(autor);
+        else {
+            Autor ta = obtenerAutor(autor.darNombre());
+            ta.agregarLibros(autor.darLibros());
+        }
+    }
+    
+    private void agregarLibro(Libro l){
+        if (!libroExiste(l.darTitulo())) {
+            libros.add(l);
+            
+            l.darAutores().forEach((a) -> {
+                agregarAutor(a);
+            });
+        }
     }
 }

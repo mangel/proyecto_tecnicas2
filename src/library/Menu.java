@@ -5,9 +5,9 @@ import java.util.Scanner;
 
 public class Menu {
     
-    private Biblioteca biblioteca;
+    private final Biblioteca biblioteca;
     
-    private Scanner sc;
+    private final Scanner sc;
     private short option;
     
     public Menu(){
@@ -25,6 +25,10 @@ public class Menu {
             System.out.println("\t5. Mostrar todos los libros.");
             System.out.println("\t6. Mostrar todos los autores.");
             System.out.println("\t7. Salir.");
+            System.out.println("\t8. Mostrar número de autores.");
+            System.out.println("\t9. Mostrar libro con más páginas.");
+            System.out.println("\t10. Mostrar autor con más libros.");
+            System.out.println("\t11. Editar paginas de libro.");
             
             option = sc.nextShort();
 
@@ -46,6 +50,18 @@ public class Menu {
                     break;
                 case 6:
                     manejarOpcionMostrarAutores();
+                    break;
+                case 8:
+                    manejarOpcionMostrarNumeroAutores();
+                    break;
+                case 9:
+                    manejarOpcionMostrarLibroConMasPaginas();
+                    break;
+                case 10:
+                    manejarOpcionMostrarAutorConMasLibros();
+                    break;
+                case 11:
+                    manejarOpcionEditarPaginasLibro();
                     break;
             }
         } while(option != 7);
@@ -126,6 +142,53 @@ public class Menu {
     
     private void manejarOpcionMostrarLibros(){
         mostrarLibros(biblioteca.darLibros());
+    }
+    
+    private void manejarOpcionMostrarNumeroAutores(){
+        System.out.println("Usted ha seleccionado la opción 8, contar autores.");
+        System.out.println("Salida:");
+        System.out.println("La biblioteca cuenta con " + biblioteca.contarAutores() + ".");
+    }
+    
+    private void manejarOpcionMostrarLibroConMasPaginas(){
+        System.out.println("Usted ha seleccionado la opción 9, libro con más páginas.");
+        
+        Libro l = biblioteca.obtenerLibroConMasPaginas();
+        
+        System.out.println("Salida:");
+        System.out.println(l);
+    }
+    
+    private void manejarOpcionMostrarAutorConMasLibros(){
+        System.out.println("Usted ha seleccionado la opción 10, dar autor con más libros.");
+        System.out.println("Salida:");
+        
+        Autor a = biblioteca.obtenerAutorConMasLibros();
+        
+        System.out.println("El autor con más libros en la biblioteca es " + a.darNombre() + " con un total de " + a.contarLibros());
+    }
+    
+    private void manejarOpcionEditarPaginasLibro(){
+        Scanner innerSc = new Scanner(System.in);
+        System.out.println("Usted ha seleccionado la opcion 11 (bono), editar copias.");
+        System.out.print("Ingrese los datos del libro: ");
+        
+        String input = innerSc.nextLine();
+        
+        String[] tokens = input.split("&");
+        
+        if (tokens.length == 2){
+            boolean result = biblioteca.editarPaginasLibro(tokens[0], Integer.parseInt(tokens[1]));
+            
+            if (result){
+                System.out.println("Los nuevos datos del libro son: ");
+                Libro l = biblioteca.buscarLibrosPorTitulo(tokens[0]).get(0);
+                System.out.println(l);
+            } else
+                System.out.println("El libro no existe.");
+        }else
+            System.out.println("Error de formato.");
+        
     }
     
     private void mostrarLibros(ArrayList<Libro> libros){
