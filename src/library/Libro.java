@@ -28,8 +28,31 @@ public class Libro {
         return titulo;
     }
     
+    public int darPaginas(){
+        return this.paginas;
+    }
+    
     public ArrayList<Autor> darAutores(){
         return autores;
+    }
+    
+    public void editarPaginas(int nuevoValor){
+        this.paginas = nuevoValor;
+    }
+    
+    public void agregarAutor(Autor a){
+        boolean existe = false;
+        
+        for (Autor ta:autores){
+            if(ta.darNombre().equals(a.darNombre())){
+                existe = true;
+                break;
+            }
+        }
+        
+        if (!existe){
+            autores.add(a);
+        }
     }
     
     @Override
