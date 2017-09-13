@@ -136,11 +136,13 @@ public class Menu {
     }
     
     private void manejarOpcionMostrarAutores(){
+        System.out.println("Usted ha seleccionado la opción 5, mostrar autores.");
         for (Autor a : biblioteca.darAutores())
             System.out.println(a.toString());
     }
     
     private void manejarOpcionMostrarLibros(){
+        System.out.println("Usted ha seleccionado la opción 6, mostrar libros.");
         mostrarLibros(biblioteca.darLibros());
     }
     
@@ -165,7 +167,10 @@ public class Menu {
         
         Autor a = biblioteca.obtenerAutorConMasLibros();
         
-        System.out.println("El autor con más libros en la biblioteca es " + a.darNombre() + " con un total de " + a.contarLibros());
+        if (a != null)
+            System.out.println("El autor con más libros en la biblioteca es " + a.darNombre() + " con un total de " + a.contarLibros());
+       else
+            System.out.println("No hay autores.");
     }
     
     private void manejarOpcionEditarPaginasLibro(){
