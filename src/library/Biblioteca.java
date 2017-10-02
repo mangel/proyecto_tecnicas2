@@ -5,11 +5,11 @@ import java.util.ArrayList;
 public class Biblioteca {
     
     private final ArrayList<Autor> autores;
-    private final ArrayList<Libro> libros;
+    private final ArrayList<ElementoBiblioteca> elementos;
     
     public Biblioteca(){
         autores = new ArrayList<>();
-        libros = new ArrayList<>();
+        elementos = new ArrayList<>();
     }
     
     public void agregarAutor(String nombre, String mail, String genero){
@@ -17,26 +17,50 @@ public class Biblioteca {
             autores.add(new Autor(nombre, mail, genero));
     }
     
-    public void agregarLibro(String titulo, String autores, int cantidad, int paginas){
-        Libro l = new Libro(titulo, cantidad, paginas);
-            
+    public void agregarLibro(String titulo, String autores, int cantidad, int paginas, boolean tapaDura){
+        
         String[] tokens = autores.split("_");
             
+        ArrayList<Autor> listaAutores = new ArrayList<>();
         Autor ta = null;
             
         for(String s: tokens) {
             ta = obtenerAutor(s);
-            if (ta == null){
-                ta = new Autor(s);
-                ta.agregarLibro(l);
-                l.agregarAutor(ta);
-            } else {
-                l.agregarAutor(ta);
-                ta.agregarLibro(l);
-            }
+            if (ta == null)
+                listaAutores.add(new Autor(s));
+             else
+                listaAutores.add(ta);
         }
-            
+        
+        Libro l = new Libro(cantidad, titulo, paginas, listaAutores, tapaDura);
+        
         agregarLibro(l);
+    }
+    
+    public void agregarArticulo(String titulo, String autores, String [] keywords, String URL, int cantidad, int paginas){
+        
+        String[] tokens = autores.split("_");
+            
+        ArrayList<Autor> listaAutores = new ArrayList<>();
+        Autor ta = null;
+            
+        for(String s: tokens) {
+            ta = obtenerAutor(s);
+            if (ta == null)
+                listaAutores.add(new Autor(s));
+             else
+                listaAutores.add(ta);
+        }
+        
+        Articulo a = new Articulo(cantidad, titulo, paginas, listaAutores, URL, keywords);
+        
+        agregarArticulo(a);
+    }
+    
+    public void agregarPC(int numeroDeSerie, String sistemaOperativo, int cantidadDisponible){
+        PC pc = new PC(cantidadDisponible, numeroDeSerie, sistemaOperativo);
+        
+        agregarPC(pc);
     }
     
     public ArrayList<Libro> buscarLibrosPorTitulo(String titulo){
@@ -44,7 +68,7 @@ public class Biblioteca {
         
         String [] keywords = titulo.split("&");
         
-        for(Libro l: libros)
+        for(Libro l: darLibros())
             if (l.tituloContienePalabrasClave(keywords))
                 result.add(l);
         
@@ -54,7 +78,7 @@ public class Biblioteca {
     public ArrayList<Libro> buscarLibrosPorAutor(String nombreAutor){
         ArrayList<Libro> result = new ArrayList<>();
         
-        for(Libro l: libros)
+        for(Libro l: darLibros())
             for (Autor a: l.darAutores())
                 if (a.darNombre().equalsIgnoreCase(nombreAutor)){
                     result.add(l);
@@ -69,47 +93,67 @@ public class Biblioteca {
     }
     
     public ArrayList<Libro> darLibros(){
-        return libros;
-    }
-    
-    public int contarAutores(){
-        return autores.size();
-    }
-    
-    public Libro obtenerLibroConMasPaginas(){
-        Libro result = null;
+        ArrayList<Libro> result = new ArrayList<>();
         
-        for(Libro l : libros)
-            if (result != null){
-                if(l.darPaginas() > result.darPaginas())
-                    result = l;
-            } else
-                result = l;
+        for(ElementoLectura e:darEscritos())
+            if ((ElementoLectura)e instanceof Libro)
+                result.add((Libro)e);
         
         return result;
     }
     
-    public Autor obtenerAutorConMasLibros(){
-        Autor result = null;
+    public ArrayList<Articulo> darArticulos(){
+        ArrayList<Articulo> result = new ArrayList<>();
         
-        for(Autor a:autores)
-            if(result != null){
-                if(a.contarLibros() > result.contarLibros())
-                    result = a;
-            } else
-                result = a;
-                
+        for(ElementoLectura e:darEscritos())
+            if ((ElementoLectura)e instanceof Articulo)
+                result.add((Articulo)e);
+        
         return result;
     }
     
-    public boolean editarPaginasLibro(String titulo, int nuevoValorPaginas){
+    public ArrayList<ElementoBiblioteca> darElementos(){
+        return elementos;
+    }
+        
+    public boolean registrarEntrada(int id){
         boolean result = false;
-        Libro l = obtenerLibro(titulo);
         
-        if (l != null){
-            l.editarPaginas(nuevoValorPaginas);
-            result = true;
-        }
+        ElementoBiblioteca e = buscarElemento(id);
+        
+        if(e != null)
+            result = e.recibirCopia();
+        
+        return result;
+    }
+    
+    public boolean registrarSalida(int id){
+        boolean result = false;
+        
+        ElementoBiblioteca e = buscarElemento(id);
+        
+        if(e != null)
+            result = e.prestar();
+        
+        return result;
+    }
+    
+    private ArrayList<ElementoLectura> darEscritos(){
+        ArrayList<ElementoLectura> result = new ArrayList<>();
+        
+        for(ElementoBiblioteca e:elementos)
+            if(e instanceof ElementoLectura)
+                result.add((ElementoLectura)e);
+        
+        return result;
+    }
+    
+    private ArrayList<PC> darPCs(){
+        ArrayList<PC> result = new ArrayList<>();
+        
+        for(ElementoBiblioteca e:elementos)
+            if(e instanceof PC)
+                result.add((PC)e);
         
         return result;
     }
@@ -126,8 +170,28 @@ public class Biblioteca {
     
     private boolean libroExiste(String titulo){
         boolean result = false;
-        for(Libro l : libros)
+        for(Libro l : darLibros())
             if(l.darTitulo().equals(titulo)){
+                result = true;
+                break;
+            }
+        return result;
+    }
+    
+    private boolean articuloExiste(String titulo){
+        boolean result = false;
+        for(Articulo a : darArticulos())
+            if(a.darTitulo().equals(titulo)){
+                result = true;
+                break;
+            }
+        return result;
+    }
+    
+    private boolean PCExiste(int numeroDeSerie){
+        boolean result = false;
+        for(PC pc : darPCs())
+            if(pc.darNumeroDeSerie() == numeroDeSerie){
                 result = true;
                 break;
             }
@@ -146,18 +210,6 @@ public class Biblioteca {
         return a;
     }
     
-    private Libro obtenerLibro (String titulo){
-        Libro l = null;
-        
-        for (Libro tl:libros)
-            if(tl.darTitulo().equals(titulo)){
-                l = tl;
-                break;
-            }
-        
-        return l;
-    }
-    
     private void agregarAutor(Autor autor) {
         if(!autorExiste(autor.darNombre()))
             autores.add(autor);
@@ -169,11 +221,36 @@ public class Biblioteca {
     
     private void agregarLibro(Libro l){
         if (!libroExiste(l.darTitulo())) {
-            libros.add(l);
+            elementos.add(l);
             
             l.darAutores().forEach((a) -> {
                 agregarAutor(a);
             });
         }
+    }
+    
+    private void agregarArticulo(Articulo a){
+        if (!articuloExiste(a.darTitulo())) {
+            elementos.add(a);
+            
+            a.darAutores().forEach((au) -> {
+                agregarAutor(au);
+            });
+        }
+    }
+    
+    private void agregarPC(PC pc){
+        if (!PCExiste(pc.darNumeroDeSerie()))
+            elementos.add(pc);
+    }
+    
+    private ElementoBiblioteca buscarElemento(int id){
+        ElementoBiblioteca result = null;
+        
+        for(ElementoBiblioteca eb:elementos)
+            if (eb.darId() == id)
+                result = eb;
+        
+        return result;
     }
 }

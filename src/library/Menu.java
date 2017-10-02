@@ -24,11 +24,12 @@ public class Menu {
             System.out.println("\t4. Buscar libro por autor.");
             System.out.println("\t5. Mostrar todos los libros.");
             System.out.println("\t6. Mostrar todos los autores.");
-            System.out.println("\t7. Salir.");
-            System.out.println("\t8. Mostrar número de autores.");
-            System.out.println("\t9. Mostrar libro con más páginas.");
-            System.out.println("\t10. Mostrar autor con más libros.");
-            System.out.println("\t11. Editar paginas de libro.");
+            System.out.println("\t7. Ingresar artículo.");
+            System.out.println("\t8. Ingresar PC.");
+            System.out.println("\t9. Mostrar elementos.");
+            System.out.println("\t10. Registrar entrada.");
+            System.out.println("\t11. Registrar salida.");
+            System.out.println("\t12. Salir.");
             
             option = sc.nextShort();
 
@@ -51,20 +52,23 @@ public class Menu {
                 case 6:
                     manejarOpcionMostrarAutores();
                     break;
+                case 7:
+                    manejarOpcionIngresarArticulo();
+                    break;
                 case 8:
-                    manejarOpcionMostrarNumeroAutores();
+                    manejarOpcionIngresarPC();
                     break;
                 case 9:
-                    manejarOpcionMostrarLibroConMasPaginas();
+                    manejarOpcionMostrarElementos();
                     break;
                 case 10:
-                    manejarOpcionMostrarAutorConMasLibros();
+                    manejarOpcionRegistrarEntrada();
                     break;
                 case 11:
-                    manejarOpcionEditarPaginasLibro();
+                    manejarOpcionRegistrarSalida();
                     break;
             }
-        } while(option != 7);
+        } while(option != 12);
     }
     
     private void manejarOpcionIngresarAutor(){
@@ -99,8 +103,8 @@ public class Menu {
         
         String [] tokens = input.split("&");
         
-        if (tokens.length == 4){
-            biblioteca.agregarLibro(tokens[0], tokens[1], Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]));
+        if (tokens.length == 5){
+            biblioteca.agregarLibro(tokens[0], tokens[1], Integer.parseInt(tokens[3]), Integer.parseInt(tokens[4]), tokens[2].equalsIgnoreCase("si"));
         }
         else
             output = "Error de formato de entrada";
@@ -136,64 +140,99 @@ public class Menu {
     }
     
     private void manejarOpcionMostrarAutores(){
-        System.out.println("Usted ha seleccionado la opción 5, mostrar autores.");
+        System.out.println("Usted ha seleccionado la opción 4, mostrar autores.");
         for (Autor a : biblioteca.darAutores())
             System.out.println(a.toString());
     }
     
     private void manejarOpcionMostrarLibros(){
-        System.out.println("Usted ha seleccionado la opción 6, mostrar libros.");
+        System.out.println("Usted ha seleccionado la opción 5, mostrar libros.");
         mostrarLibros(biblioteca.darLibros());
     }
-    
-    private void manejarOpcionMostrarNumeroAutores(){
-        System.out.println("Usted ha seleccionado la opción 8, contar autores.");
-        System.out.println("Salida:");
-        System.out.println("La biblioteca cuenta con " + biblioteca.contarAutores() + ".");
-    }
-    
-    private void manejarOpcionMostrarLibroConMasPaginas(){
-        System.out.println("Usted ha seleccionado la opción 9, libro con más páginas.");
-        
-        Libro l = biblioteca.obtenerLibroConMasPaginas();
-        
-        System.out.println("Salida:");
-        System.out.println(l);
-    }
-    
-    private void manejarOpcionMostrarAutorConMasLibros(){
-        System.out.println("Usted ha seleccionado la opción 10, dar autor con más libros.");
-        System.out.println("Salida:");
-        
-        Autor a = biblioteca.obtenerAutorConMasLibros();
-        
-        if (a != null)
-            System.out.println("El autor con más libros en la biblioteca es " + a.darNombre() + " con un total de " + a.contarLibros());
-       else
-            System.out.println("No hay autores.");
-    }
-    
-    private void manejarOpcionEditarPaginasLibro(){
+       
+    private void manejarOpcionIngresarArticulo(){
         Scanner innerSc = new Scanner(System.in);
-        System.out.println("Usted ha seleccionado la opcion 11 (bono), editar copias.");
-        System.out.print("Ingrese los datos del libro: ");
+        System.out.println("Usted ha seleccionado la opcion 7, agregar artículo.");
+        
+        System.out.println("Ingrese los datos del nuevo artículo:");
+        
+        String input = innerSc.nextLine();
+        String output = "El artículo ha sido agregado.";
+        
+        String [] tokens = input.split("&");
+        
+        if (tokens.length == 6){
+            biblioteca.agregarArticulo(tokens[0], tokens[1], tokens[2].split("_"), tokens[3], Integer.parseInt(tokens[4]), Integer.parseInt(tokens[5]));
+        }
+        else
+            output = "Error de formato de entrada";
+        
+        System.out.println("Salida: ");
+        System.out.println(output);
+    }
+    
+    private void manejarOpcionIngresarPC(){
+        Scanner innerSc = new Scanner(System.in);
+        System.out.println("Usted ha seleccionado la opcion 8, agregar PC.");
+        
+        System.out.println("Ingrese los datos del nuevo artículo:");
+        
+        String input = innerSc.nextLine();
+        String output = "El PC ha sido agregado.";
+        
+        String [] tokens = input.split("&");
+        
+        if (tokens.length == 3){
+            biblioteca.agregarPC(Integer.parseInt(tokens[0]), tokens[1], Integer.parseInt(tokens[2]));
+        }
+        else
+            output = "Error de formato de entrada";
+        
+        System.out.println("Salida: ");
+        System.out.println(output);
+    }
+    
+    private void manejarOpcionMostrarElementos(){
+        System.out.println("Usted ha seleccionado la opción 9, mostrar elementos.");
+        mostrarElementos(biblioteca.darElementos());
+    }
+    
+    private void manejarOpcionRegistrarEntrada(){
+        Scanner innerSc = new Scanner(System.in);
+        System.out.println("Usted ha seleccionado la opcion 10, registrar entrada.");
+        
+        System.out.print("Ingrese el id del elemento: ");
         
         String input = innerSc.nextLine();
         
-        String[] tokens = input.split("&");
+        String output = "La disponibilidad del elemento ha sido incrementada.";
         
-        if (tokens.length == 2){
-            boolean result = biblioteca.editarPaginasLibro(tokens[0], Integer.parseInt(tokens[1]));
-            
-            if (result){
-                System.out.println("Los nuevos datos del libro son: ");
-                Libro l = biblioteca.buscarLibrosPorTitulo(tokens[0]).get(0);
-                System.out.println(l);
-            } else
-                System.out.println("El libro no existe.");
-        }else
-            System.out.println("Error de formato.");
+        boolean result = biblioteca.registrarEntrada(Integer.parseInt(input));
         
+        if (!result)
+            output = "Ha ocurrido un error durante el proceso de devolución.";
+        
+        System.out.println("Salida: ");
+        System.out.println(output);
+    }
+    
+    private void manejarOpcionRegistrarSalida(){
+        Scanner innerSc = new Scanner(System.in);
+        System.out.println("Usted ha seleccionado la opcion 11, registrar salida.");
+        
+        System.out.print("Ingrese el id del elemento: ");
+        
+        String input = innerSc.nextLine();
+        
+        String output = "La disponibilidad del elemento ha sido decrementada.";
+        
+        boolean result = biblioteca.registrarSalida(Integer.parseInt(input));
+        
+        if (!result)
+            output = "Ha ocurrido un error durante el proceso de salida.";
+        
+        System.out.println("Salida: ");
+        System.out.println(output);
     }
     
     private void mostrarLibros(ArrayList<Libro> libros){
@@ -201,8 +240,8 @@ public class Menu {
             System.out.println(l.toString());
     }
     
-//    private void mostrarAutores(ArrayList<Autor> autores){
-//        for (Autor a : autores)
-//            System.out.println(a.toString());
-//    }
+    private void mostrarElementos(ArrayList<ElementoBiblioteca> elementos){
+        for(ElementoBiblioteca e:elementos)
+            System.out.println(e);
+    }
 }
