@@ -127,13 +127,15 @@ public class Biblioteca {
         return result;
     }
     
-    public boolean registrarSalida(int id){
+    public boolean registrarSalida(int id) throws UnavailableItemUnitsException, UnavailableItemException{
         boolean result = false;
         
         ElementoBiblioteca e = buscarElemento(id);
         
         if(e != null)
             result = e.prestar();
+        else
+            throw new UnavailableItemException(id);
         
         return result;
     }

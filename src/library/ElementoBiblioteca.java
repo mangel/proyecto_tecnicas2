@@ -21,12 +21,14 @@ public abstract class ElementoBiblioteca {
         return numeroCopiasDisponibles;
     }
     
-    public boolean prestar(){
+    public boolean prestar() throws UnavailableItemUnitsException{
         boolean result = false;
         
         if (numeroCopiasDisponibles > 0){
             numeroCopiasDisponibles--;
             result = true;
+        } else {
+            throw new UnavailableItemUnitsException(id);
         }
         
         return result;
