@@ -104,7 +104,7 @@ public class Menu {
         if (tokens.length == 3)
             biblioteca.agregarAutor(tokens[0], tokens[1], tokens[2]);
         else
-            throw new BadNumberOfArgumentsException("agregar un autor", 3, tokens.length, false);
+            throw new BadNumberOfArgumentsException("agregar un autor", 3, tokens.length, false, "");
         
         System.out.println("Salida: ");
         System.out.println(output);
@@ -131,7 +131,7 @@ public class Menu {
             biblioteca.agregarLibro(tokens[0], tokens[1], Integer.parseInt(tokens[3]), Integer.parseInt(tokens[4]), tokens[2].equalsIgnoreCase("si"));
         }
         else
-            throw new BadNumberOfArgumentsException("agregar un libro", 5, tokens.length, false);
+            throw new BadNumberOfArgumentsException("agregar un libro", 5, tokens.length, false, "");
         
         System.out.println("Salida: ");
         System.out.println(output);
@@ -186,12 +186,14 @@ public class Menu {
         String [] tokens = input.split("&");
         
         if (tokens.length == 6){
+            if (tokens[1].split("_").length == 0)
+                throw new BadNumberOfArgumentsException("agregar artículo", 1, 0, true, "para el parámetro de autores");
             if (tokens[2].split("_").length == 0)
-                throw new BadNumberOfArgumentsException("agregar un artículo", 1, tokens.length, true);
+                throw new BadNumberOfArgumentsException("agregar un artículo", 1, tokens.length, true, "para el parámetro de keywords");
             biblioteca.agregarArticulo(tokens[0], tokens[1], tokens[2].split("_"), tokens[3], Integer.parseInt(tokens[4]), Integer.parseInt(tokens[5]));
         }
         else
-            throw new BadNumberOfArgumentsException("agregar un artículo", 6, tokens.length, false);
+            throw new BadNumberOfArgumentsException("agregar un artículo", 6, tokens.length, false, "");
         
         System.out.println("Salida: ");
         System.out.println(output);
@@ -218,7 +220,7 @@ public class Menu {
             biblioteca.agregarPC(Integer.parseInt(tokens[0]), tokens[1], Integer.parseInt(tokens[2]));
         }
         else
-            throw new BadNumberOfArgumentsException("agregar un PC", 3, tokens.length, false);
+            throw new BadNumberOfArgumentsException("agregar un PC", 3, tokens.length, false, "");
         
         System.out.println("Salida: ");
         System.out.println(output);

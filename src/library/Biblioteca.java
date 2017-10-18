@@ -17,10 +17,13 @@ public class Biblioteca {
             autores.add(new Autor(nombre, mail, genero));
     }
     
-    public void agregarLibro(String titulo, String autores, int cantidad, int paginas, boolean tapaDura){
+    public void agregarLibro(String titulo, String autores, int cantidad, int paginas, boolean tapaDura) throws BadNumberOfArgumentsException{
         
         String[] tokens = autores.split("_");
-            
+        
+        if (tokens.length == 0)
+            throw new BadNumberOfArgumentsException("agregar libro", 1, 0, true, "para el parámetro de autores.");
+        
         ArrayList<Autor> listaAutores = new ArrayList<>();
         Autor ta = null;
             
@@ -37,7 +40,7 @@ public class Biblioteca {
         agregarLibro(l);
     }
     
-    public void agregarArticulo(String titulo, String autores, String [] keywords, String URL, int cantidad, int paginas){
+    public void agregarArticulo(String titulo, String autores, String [] keywords, String URL, int cantidad, int paginas) {
         
         String[] tokens = autores.split("_");
             
